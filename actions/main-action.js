@@ -36,18 +36,21 @@ async function sleepWithLog() {
 
 async function mainAction(ethAccount, web3ZkSync, scan, proxy, depositOkxAddress) {
   const amount = +randomNumber(MIN_AMOUNT_ETH, MAX_AMOUNT_ETH).toFixed(5);
+  const onFee = +randomNumber(LEAVE_AMOUNT_ETH_MIN, LEAVE_AMOUNT_ETH_MAX).toFixed(5);
 
-  await waitForOkxBalance(amount, 'ETH');
+  const workBalance = +(amount - onFee).toFixed(5);
 
-  await withdrawToken(ethAccount.address, amount, 'ETH', 'zkSync Era');
+  await waitForOkxBalance(workBalance, 'ETH');
 
-  await waitForEthBalance(web3ZkSync, amount * 0.96, ethAccount.address);
+  await withdrawToken(ethAccount.address, workBalance, 'ETH', 'zkSync Era');
+
+  await waitForEthBalance(web3ZkSync, workBalance * 0.96, ethAccount.address);
 
   await sleepWithLog();
 
   // 30 процентов вероятности заюзать зероленд
   if (Math.random() < 0.4) {
-    await depositZeroLend(ethAccount, web3ZkSync, scan, amount);
+    await depositZeroLend(ethAccount, web3ZkSync, scan, workBalance);
     await sleepWithLog();
 
     await withdrawZeroLend(ethAccount, web3ZkSync, scan);
@@ -55,17 +58,17 @@ async function mainAction(ethAccount, web3ZkSync, scan, proxy, depositOkxAddress
   }
 
   if (Math.random() < 0.4) {
-    await depositReactorFusion(ethAccount, web3ZkSync, scan, amount);
+    await depositReactorFusion(ethAccount, web3ZkSync, scan, workBalance);
     await sleepWithLog();
     await withdrawReactorFusion(ethAccount, web3ZkSync, scan);
     await sleepWithLog();
   }
 
-  await depositEraLandAction(ethAccount, web3ZkSync, scan, amount);
+  await depositEraLandAction(ethAccount, web3ZkSync, scan, workBalance);
 
   await sleepWithLog();
 
-  const amountBorrowUsdc = +(amount * 3800 * AMOUNT_BORROW_PERCENT).toFixed(5);
+  const amountBorrowUsdc = +(workBalance * 3800 * AMOUNT_BORROW_PERCENT).toFixed(5);
 
   await borrowEraLandAction(ethAccount, web3ZkSync, scan, amountBorrowUsdc);
 
@@ -126,13 +129,13 @@ async function mainAction(ethAccount, web3ZkSync, scan, proxy, depositOkxAddress
   await sleepWithLog();
 
   if (Math.random() < 0.3) {
-    await depositReactorFusion(ethAccount, web3ZkSync, scan, amount);
+    await depositReactorFusion(ethAccount, web3ZkSync, scan, workBalance);
     await withdrawReactorFusion(ethAccount, web3ZkSync, scan);
     await sleepWithLog();
   }
 
   if (Math.random() < 0.3) {
-    await depositZeroLend(ethAccount, web3ZkSync, scan, amount);
+    await depositZeroLend(ethAccount, web3ZkSync, scan, workBalance);
     await sleepWithLog();
 
     await withdrawZeroLend(ethAccount, web3ZkSync, scan);
