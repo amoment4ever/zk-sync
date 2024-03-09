@@ -1,6 +1,7 @@
 const ccxt = require('ccxt');
 const { OKX_API_KEY, SECRET_OKX, OKX_PHRASE } = require('../secret');
 const { logger } = require('../utils/logger');
+const { retry } = require('../utils/retry');
 
 const exchange = new ccxt.okx({
   apiKey: OKX_API_KEY,
@@ -10,13 +11,15 @@ const exchange = new ccxt.okx({
 });
 
 async function getTokenBalance(token) {
-  const balance = await exchange.fetchBalance({ type: 'funding' });
+  return await retry(async () => {
+    const balance = await exchange.fetchBalance({ type: 'funding' });
 
-  return balance[token]?.free;
+    return balance[token]?.free;
+  }, 4, 12000);
 }
 
 async function withdrawToken(address, amount, token, network) {
-  try {
+  return await retry(async () => {
     const tag = '';
 
     const networks = await exchange.fetchCurrencies();
@@ -31,9 +34,7 @@ async function withdrawToken(address, amount, token, network) {
     logger.info('Response withdraw', withdrawal);
 
     return withdrawal;
-  } catch (error) {
-    logger.error('Error withdraw', error);
-  }
+  }, 4, 12000);
 }
 
 module.exports = {
