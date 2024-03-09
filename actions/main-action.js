@@ -40,11 +40,11 @@ async function mainAction(ethAccount, web3ZkSync, scan, proxy, depositOkxAddress
 
   const workBalance = +(amount - onFee).toFixed(5);
 
-  await waitForOkxBalance(workBalance, 'ETH');
+  await waitForOkxBalance(amount, 'ETH');
 
-  await withdrawToken(ethAccount.address, workBalance, 'ETH', 'zkSync Era');
+  await withdrawToken(ethAccount.address, amount, 'ETH', 'zkSync Era');
 
-  await waitForEthBalance(web3ZkSync, workBalance * 0.96, ethAccount.address);
+  await waitForEthBalance(web3ZkSync, amount * 0.96, ethAccount.address);
 
   await sleepWithLog();
 
