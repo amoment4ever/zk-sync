@@ -15,7 +15,7 @@ async function getTokenBalance(token) {
     const balance = await exchange.fetchBalance({ type: 'funding' });
 
     return balance[token]?.free;
-  }, 4, 12000);
+  }, 10, 20000);
 }
 
 async function withdrawToken(address, amount, token, network) {
@@ -34,7 +34,7 @@ async function withdrawToken(address, amount, token, network) {
     logger.info('Response withdraw', withdrawal);
 
     return withdrawal;
-  }, 4, 12000);
+  }, 10, 20000);
 }
 
 module.exports = {
