@@ -43,21 +43,16 @@ async function transferFromSubToMaster(curreny) {
   for (const { subAcct } of data) {
     const { data: subAccountBalance } = await exchange.privateGetAssetSubaccountBalances({ subAcct });
 
+    logger.info('Balance sub account', {
+      subAcct,
+      subAccountBalance,
+    });
+
     for (const money of subAccountBalance) {
       const {
         availBal,
-        bal,
         ccy,
-        frozenBal,
       } = money;
-
-      logger.info('Balance sub account', {
-        subAcct,
-        availBal,
-        bal,
-        ccy,
-        frozenBal,
-      });
 
       if (ccy === curreny && +availBal > 0) {
         const response = await exchange.transfer(ccy, availBal, 6, 6, {
