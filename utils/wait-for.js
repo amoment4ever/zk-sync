@@ -1,5 +1,5 @@
 const { default: BigNumber } = require('bignumber.js');
-const { getTokenBalance } = require('../components/okx');
+const { getTokenBalance, transferFromSubToMaster } = require('../components/okx');
 const { web3Eth } = require('../components/web3-eth');
 const { MAX_GWEI_ETH } = require('../settings');
 const { logger } = require('./logger');
@@ -43,6 +43,11 @@ async function waitForOkxBalance(amount, token) {
       } else {
         logger.info('Sleep 10000ms, waiting for deposit ETH on OKX');
         await sleep(10000);
+
+        logger.info('Check sub accounts');
+        await transferFromSubToMaster('ETH').catch((exc) => {
+          logger.error('transfer from sub account error', exc);
+        });
       }
     }
   }, 3, 10000);

@@ -80,7 +80,7 @@ async function withdrawEraLandAction(ethAccount, web3, scan) {
     });
 
     if (depositedAmount) {
-      const withdraw = await eraLand.withdraw(new BigNumber(depositedAmount).minus(3 * 1e10).toString()).send({
+      const withdraw = await eraLand.withdraw(new BigNumber(depositedAmount).minus(3 * 1e11).toString()).send({
         from: ethAccount.address,
         gasPrice,
       });

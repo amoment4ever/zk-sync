@@ -37,7 +37,44 @@ async function withdrawToken(address, amount, token, network) {
   }, 10, 20000);
 }
 
+async function transferFromSubToMaster(curreny) {
+  const { data } = await exchange.privateGetUsersSubaccountList();
+
+  for (const { subAcct } of data) {
+    const { data: subAccountBalance } = await exchange.privateGetAssetSubaccountBalances({ subAcct });
+
+    for (const money of subAccountBalance) {
+      const {
+        availBal,
+        bal,
+        ccy,
+        frozenBal,
+      } = money;
+
+      logger.info('Balance sub account', {
+        subAcct,
+        availBal,
+        bal,
+        ccy,
+        frozenBal,
+      });
+
+      if (ccy === curreny && +availBal > 0) {
+        const response = await exchange.transfer(ccy, availBal, 6, 6, {
+          type: 2,
+          subAcct,
+        });
+
+        logger.info('Transfer response', {
+          response,
+        });
+      }
+    }
+  }
+}
+
 module.exports = {
   withdrawToken,
   getTokenBalance,
+  transferFromSubToMaster,
 };
